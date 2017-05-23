@@ -1,12 +1,14 @@
-gapi.load('auth2');
+//gapi.load('client:auth2',read);
+//gapi.load('client:auth2',update);
 
+//gapi.load('client');
 
+read();
 
-
-function read(range) {
-    console.log(range);
-//    var range = 'A1:C6';
-    return $.ajax({
+function read() {
+    console.log("READ")
+    var range = 'A1:C6';
+    $.ajax({
         url: 'https://sheets.googleapis.com/v4/spreadsheets/1_jwvqIuHLL79VMd7a5qoxinWpJLNsQRzX8PYHjOR_7A/values/Sheet1!' + range + '?key=AIzaSyAFtlrU913l8DZ8cBgzgxlo4G4RhCG_6xY',
         type: 'GET',
         crossDomain: true,
@@ -19,12 +21,39 @@ function read(range) {
             alert('Failed!');
         }
     });
-    //return true;
+
+    var f = {
+        values: [
+            ["Item", "Cost", "Stocked", "Ship Date"],
+            ["Reily", "$20.50", "4", "3/1/2016"],
+            ["Door", "$15", "2", "3/15/2016"],
+            ["Engine", "$100", "1", "30/20/2016"],
+            ["Totals", "=SUM(B2:B4)", "=SUM(C2:C4)", "=MAX(D2:D4)"]
+        ]
+    };
+
+    $.ajax({
+        headers: {  "Content-type": "application/json",
+                    "Content-Length": f.length,
+                    "Authorization": "Bearer ya29.GltTBD9wMTZD08Vaaxig_f32N_3tOmwxPwUDvWzUNLuQgDJyFKNK1MlPmWam-dfzWea3DMFCHtK3--BsZztvPOM58wNMDV9nBqz9w21Ngfi3PloLyZ7g0Pyo-yVw"},
+        url: 'https://sheets.googleapis.com/v4/spreadsheets/1_jwvqIuHLL79VMd7a5qoxinWpJLNsQRzX8PYHjOR_7A/values/Sheet1!A1?key=AIzaSyAFtlrU913l8DZ8cBgzgxlo4G4RhCG_6xY',
+        type: 'PUT',
+        crossDomain: true,
+        data: JSON.stringify(f),
+        dataType: 'jsonp',
+        success: function (result) {
+            console.log(result);
+        },
+        error: function () {
+            alert('Failed!');
+        }
+    });
+
+
+
 }
 
 function process(result,range){
-    console.log(result);
-    console.log(result.values[0])
     data = [];
     for(var x=0;x<result.values.length;x++) {
         data[x] = [];
@@ -35,7 +64,7 @@ function process(result,range){
 
     console.log(data);
 
-
+    //update(w);
 
 }
 
@@ -47,15 +76,9 @@ w = [
     ["Totals", "=SUM(B2:B4)", "=SUM(C2:C4)", "=MAX(D2:D4)"]
 ];
 
-
-
-//write(w)
-
-//update(w);
-
-function update(range) {
-    console.log("update");
-    var data = {"values": range};
+function update() {
+    console.log("UPDATE");
+    var data = {"values": w};
 
     // 2. Initialize the JavaScript client library.
     gapi.client.init({
@@ -76,5 +99,3 @@ function update(range) {
         console.log('Error: ' + reason.result.error.message);
     });
 };
-// 1. Load the JavaScript client library.
-
